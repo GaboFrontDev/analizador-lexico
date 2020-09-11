@@ -3,9 +3,9 @@ const NUMBERS = /^(?:\d+\.?\d*|\d*\.\d+)$/;
 
 const OPERATION = 0;
 const INTEGER = 1;
-const ERROR = -1;
+const ERROR = 2;
 
-const KINDS = ["OPERATION", "INTEGER", "ERROR"];
+const KINDS = ["OPERATION", "INTEGER", "NOT DEFINED"];
 
 interface ILexico {
   source: string;
@@ -19,21 +19,21 @@ class Lexico {
     this.source = args.source.split("").reverse();
   }
 
-  evaluate(prevToken?: string) {
-    this.token = <string>(prevToken || this.source.pop());
+  evaluate() {
+    this.token = <string>this.source.pop();
 
-    let token = this.token;
-    if (this.isOperation(token)) {
+    this.token;
+    if (this.isOperation(this.token)) {
       return OPERATION;
     }
 
-    if (this.isNumber(token)) {
-      if (!this.source.length) {
-        return INTEGER;
+    if (this.isReal(this.token)) {
+      while (
+        this.source.length &&
+        this.isReal(this.token + this.source[this.source.length - 1])
+      ) {
+        this.token += this.source.pop();
       }
-      const next = <string>this.source.pop();
-      this.evaluate((token += next));
-
       return INTEGER;
     }
 
@@ -44,7 +44,7 @@ class Lexico {
     return val.match(OPERATIONS);
   }
 
-  private isNumber(val: string) {
+  private isReal(val: string) {
     return val.match(NUMBERS);
   }
 
@@ -58,7 +58,7 @@ class Lexico {
   }
 }
 
-const lexico = new Lexico({ source: "1.0+-+2+0.0001" });
+const lexico = new Lexico({ source: "201.000001+-/*10.0.0" });
 
 console.log("TOKEN  SYMBOL");
 
