@@ -1,3 +1,10 @@
+/**
+ * Editar esta constante para poder
+ * hacer pruebas con distintas cadenas.
+ */
+
+const TEST_VAL = "1.0--10.";
+
 const OPERATIONS = /(\-|\+|\/|\*).?/;
 const NUMBERS = /^(?:\d+\.?\d*|\d*\.\d+)$/;
 
@@ -58,7 +65,7 @@ class Lexico {
   }
 }
 
-const lexico = new Lexico({ source: "201.000001+-/*10.0.0" });
+const lexico = new Lexico({ source: TEST_VAL });
 
 console.log("TOKEN  SYMBOL");
 
