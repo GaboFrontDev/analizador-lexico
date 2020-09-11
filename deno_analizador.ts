@@ -5,7 +5,7 @@ const OPERATION = 0;
 const INTEGER = 1;
 const ERROR = 2;
 
-const KINDS = ["OPERATION", "INTEGER", "NOT DEFINED"];
+const KINDS = ["OPERATION", "REAL", "NOT DEFINED"];
 
 interface ILexico {
   source: string;
