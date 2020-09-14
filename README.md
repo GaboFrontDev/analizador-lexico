@@ -1,5 +1,3 @@
-Gabriel Omar Hinojoza Velarde 212491522 Universidad de Guadalajara
-
 # Rama para mini analizador léxico (Tarea 1)
 
 ### Requisitios
@@ -13,3 +11,7 @@ Gabriel Omar Hinojoza Velarde 212491522 Universidad de Guadalajara
 ### Run tests
 
 - deno test deno_analizador.spec.ts
+
+Gabriel Omar Hinojoza Velarde
+212491522
+Universidad de Guadalajara
