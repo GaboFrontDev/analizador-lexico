@@ -2,16 +2,18 @@
 
 ### Requisitios
 
-- Deno CLI
+- [Deno CLI](https://deno.land/#installation)
 
 ### Run project
 
-- deno run deno_analizador.ts
+> \$ deno run deno_analizador.ts
 
 ### Run tests
 
-- deno test deno_analizador.spec.ts
+> \$ deno test deno_analizador.spec.ts
+
+## Universidad de Guadalajara
 
 Gabriel Omar Hinojoza Velarde
+
 212491522
-Universidad de Guadalajara
