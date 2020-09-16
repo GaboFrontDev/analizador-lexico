@@ -1,4 +1,5 @@
 const IDENTIFIER = /([_a-zA-Z][_a-zA-Z0-9]{0,30})/;
+const DIGIT = /^\d+$/;
 const OPERATOR_ADD = /^(\+|\-)$/;
 const OPERATOR_MULTI = /^(\*|\/)$/;
 const OPERATOR_ASIGN = /(=)$/;
@@ -8,91 +9,184 @@ const OPERATOR_OR = /^(||)$/;
 const OPERATOR_NOT = /^(!)$/;
 const PARENTESIS = /(\(|\))$/;
 const BRAKETS = /^({|})$/;
-const SEMICOLON = /^(;)$/;
 const OPERATORS = /^(\+|-|\*|\/|=|==|>|<|>=|<=|&|\||!|\^)$/;
 const REAL_REGEX = /^(?:\d+\.?\d*|\d*\.\d+)$/;
 
 interface ILexico {
-	source: string;
+  source: string;
 }
+
+export const ERROR = -1;
 
 export const IDENTIFIER_VAL = 0;
 export const INT = 1;
 export const REAL = 2;
-export const OPERATOR = 0;
-export const INTEGER = 1;
-export const ERROR = 2;
 export const STRING = 3;
 export const TYPE = 4;
-export const SUM = 5;
+export const ADD = 5;
 export const MULTI = 6;
 export const RELAT = 7;
 export const OR = 8;
+export const AND = 9;
 export const NOT = 10;
+export const EQUAL = 11;
+export const SEMICOLON = 12;
+export const COMMA = 13;
+export const OPEN_PARENTHESIS = 14;
+export const CLOSE_PARENTHESIS = 15;
+export const OPEN_BRAKETS = 16;
+export const CLOSE_BRAKETS = 17;
 export const ASIGN = 18;
+export const IF = 19;
+export const WHILE = 20;
+export const RETURN = 21;
 const KINDS = ["OPERATION", "REAL", "NOT DEFINED"];
 
 export class Lexico {
-	private source: string[] = [];
-	private token = "";
+  private source: string[] = [];
+  private token = "";
 
-	constructor(args: ILexico) {
-		this.source = args.source.split("").reverse();
-	}
+  constructor(args: ILexico) {
+    this.source = args.source.split("").reverse();
+  }
 
-	evaluate() {
-		this.token = <string>this.source.pop();
-		if (this.isOperator(this.token)) {
-			return this.evaluateOperators();
-		}
+  evaluate() {
+    this.token = <string>this.source.pop();
 
-		if (this.isReal(this.token)) {
-			return this.evaluateReal();
-		}
+    if (this.token == ";") {
+      return SEMICOLON;
+    }
 
-		return ERROR;
-	}
+    if (this.isBrakets(this.token)) {
+      return this.token == "{" ? OPEN_BRAKETS : CLOSE_BRAKETS;
+    }
 
-	private isOperator(val: string) {
-		return val.match(OPERATORS);
-	}
+    if (this.isParenthesis(this.token)) {
+      return this.token == "(" ? OPEN_PARENTHESIS : CLOSE_PARENTHESIS;
+    }
 
-	private isReal(val: string) {
-		return val.match(REAL_REGEX);
-	}
+    if (this.isDigit(this.token)) {
+      return this.evaluateDigit();
+    }
 
-	private evaluateReal() {
-		while (
-			this.source.length &&
-			this.isReal(this.token + this.source[this.source.length - 1])
-		) {
-			this.token += this.source.pop();
-		}
-		return INTEGER;
-	}
+    if (this.isIdentifier(this.token)) {
+      return this.evaluateIdentifier();
+    }
 
-	private evaluateOperators() {
-		let operator_kind = 0;
+    if (this.isOperator(this.token)) {
+      return this.evaluateOperators();
+    }
 
-		const pairOperator = this.token + this.source[this.source.length - 1];
+    return ERROR;
+  }
 
-		if (this.token.match(OPERATOR_ADD)) operator_kind = 2;
-		if (this.token.match(OPERATOR_MULTI)) operator_kind = 2;
-		if (this.token.match(OPERATOR_ASIGN)) operator_kind = ASIGN;
-		if (this.token.match(OPERATOR_NOT)) operator_kind = NOT;
-		if (this.token.match(OPERATOR_RELAT)) {
-			operator_kind = RELAT;
-		}
+  private isOperator(val: string) {
+    return val.match(OPERATORS);
+  }
 
-		return operator_kind;
-	}
+  private isIdentifier(val: string) {
+    return val.match(IDENTIFIER);
+  }
 
-	get kind() {
-		const kind = this.evaluate();
-		return `${this.token}  ${KINDS[kind]}`;
-	}
+  private isRelational(val: string) {
+    return val.match(OPERATOR_RELAT);
+  }
 
-	get hasTokens() {
-		return this.source.length > 0;
-	}
+  private isParenthesis(val: string) {
+    return val.match(PARENTESIS);
+  }
+
+  private isBrakets(val: string) {
+    return val.match(BRAKETS);
+  }
+
+  private isReal(val: string) {
+    return val.match(REAL_REGEX);
+  }
+
+  private isDigit(val: string) {
+    return val.match(DIGIT);
+  }
+
+  private evaluateDigit() {
+    while (
+      this.source.length &&
+      this.isDigit(this.token + this.source[this.source.length - 1])
+    ) {
+      this.token += this.source.pop();
+    }
+
+    if (this.isReal(this.token + this.source[this.source.length - 1])) {
+      this.token += this.source.pop();
+      return this.evaluateReal();
+    }
+    return INT;
+  }
+
+  private evaluateIdentifier() {
+    while (
+      this.source.length &&
+      this.isIdentifier(this.token + this.source[this.source.length - 1])
+    ) {
+      this.token += this.source.pop();
+    }
+    return IDENTIFIER_VAL;
+  }
+
+  private evaluateReal() {
+    while (
+      this.source.length &&
+      this.isReal(this.token + this.source[this.source.length - 1])
+    ) {
+      this.token += this.source.pop();
+    }
+    return REAL;
+  }
+
+  private evaluateOperators() {
+    const pairOperator = this.token + this.source[this.source.length - 1];
+
+    if (this.token.match(OPERATOR_ADD)) {
+      return ADD;
+    }
+    if (this.token.match(OPERATOR_MULTI)) return MULTI;
+
+    if (this.token.match(OPERATOR_NOT)) return NOT;
+
+    if (this.token.match(OPERATOR_ASIGN)) {
+      if (pairOperator.match(OPERATOR_RELAT)) {
+        this.source.pop();
+        return RELAT;
+      }
+      return ASIGN;
+    }
+
+    if (this.isRelational(this.token)) {
+      if (pairOperator.match(OPERATOR_RELAT)) {
+        this.source.pop();
+      }
+      return RELAT;
+    }
+
+    if (pairOperator.match(OPERATOR_OR)) {
+      this.source.pop();
+      return OR;
+    }
+
+    if (pairOperator.match(OPERATOR_AND)) {
+      this.source.pop();
+      return AND;
+    }
+
+    return -1;
+  }
+
+  get kind() {
+    const kind = this.evaluate();
+    return `${this.token} ${kind}`;
+  }
+
+  get hasTokens() {
+    return this.source.length > 0;
+  }
 }
